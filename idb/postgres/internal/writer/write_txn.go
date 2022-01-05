@@ -70,7 +70,7 @@ func yieldInnerTransactions(ctx context.Context, stxnad *transactions.SignedTxnW
 			return 0, fmt.Errorf("yieldInnerTransactions() get type enum")
 		}
 		// block shouldn't be used for inner transactions.
-		assetid, err := transactionAssetID(&itxn, 0, nil)
+		assetid, err := transactionAssetID(&itxn, intra, block)
 		if err != nil {
 			return 0, err
 		}
