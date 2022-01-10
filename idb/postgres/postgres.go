@@ -935,14 +935,13 @@ func (db *IndexerDb) yieldTxnsThreadSimple(ctx context.Context, rows pgx.Rows, r
 					err = fmt.Errorf("error decoding roottxn, err: %w", err)
 					row.Error = err
 				}
-			} else {
-				// Root transaction.
-				row.Txn = new(transactions.SignedTxnWithAD)
-				*row.Txn, err = encoding.DecodeSignedTxnWithAD(txn)
-				if err != nil {
-					err = fmt.Errorf("error decoding txn, err: %w", err)
-					row.Error = err
-				}
+			}
+			// Root transaction.
+			row.Txn = new(transactions.SignedTxnWithAD)
+			*row.Txn, err = encoding.DecodeSignedTxnWithAD(txn)
+			if err != nil {
+				err = fmt.Errorf("error decoding txn, err: %w", err)
+				row.Error = err
 			}
 
 			row.RoundTime = roundtime
