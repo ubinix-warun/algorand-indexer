@@ -1514,7 +1514,7 @@ func TestSearchForInnerTransactionReturnsRootTransaction(t *testing.T) {
 	}{
 		{
 			name:    "match on root and inner-inners",
-			matches: 4,
+			matches: 3,
 			filter:  idb.TransactionFilter{Address: appAddr[:], TypeEnum: idb.TypeEnumApplication},
 		},
 		{
@@ -1621,28 +1621,28 @@ func TestNonUTF8Logs(t *testing.T) {
 			createAppTxn := test.MakeCreateAppTxn(test.AccountA)
 			createAppTxn.ApplyData.EvalDelta = transactions.EvalDelta{
 				Logs: testcase.Logs,
-				InnerTxns: []transactions.SignedTxnWithAD{
-					// Inner application call with nested cheeky logs
-					{
-						SignedTxn: transactions.SignedTxn{
-							Txn: transactions.Transaction{
-								Type: protocol.ApplicationCallTx,
-								Header: transactions.Header{
-									Sender: test.AccountA,
-								},
-								ApplicationCallTxnFields: transactions.ApplicationCallTxnFields{
-									ApplicationID: 789,
-									OnCompletion:  transactions.NoOpOC,
-								},
-							},
-						},
-						ApplyData: transactions.ApplyData{
-							EvalDelta: transactions.EvalDelta{
-								Logs: testcase.Logs,
-							},
-						},
-					},
-				},
+				// InnerTxns: []transactions.SignedTxnWithAD{
+				// 	// Inner application call with nested cheeky logs
+				// 	{
+				// 		SignedTxn: transactions.SignedTxn{
+				// 			Txn: transactions.Transaction{
+				// 				Type: protocol.ApplicationCallTx,
+				// 				Header: transactions.Header{
+				// 					Sender: test.AccountA,
+				// 				},
+				// 				ApplicationCallTxnFields: transactions.ApplicationCallTxnFields{
+				// 					ApplicationID: 789,
+				// 					OnCompletion:  transactions.NoOpOC,
+				// 				},
+				// 			},
+				// 		},
+				// 		ApplyData: transactions.ApplyData{
+				// 			EvalDelta: transactions.EvalDelta{
+				// 				Logs: testcase.Logs,
+				// 			},
+				// 		},
+				// 	},
+				// },
 			}
 
 			block, err := test.MakeBlockForTxns(test.MakeGenesisBlock().BlockHeader, &createAppTxn)
