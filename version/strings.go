@@ -66,5 +66,5 @@ func LongVersion() string {
 	} else if tagVersion != ReleaseVersion {
 		tagVersion = fmt.Sprintf("dev release build .version=%s tag=%s", ReleaseVersion, tagVersion)
 	}
-	return fmt.Sprintf("%s compiled at %s from git hash %s%s", tagVersion, CompileTime, Hash, dirtyStr)
+	return fmt.Sprintf("%s compiled at %s from git hash %s%s (develope-ws)", tagVersion, CompileTime, Hash, dirtyStr)
 }
