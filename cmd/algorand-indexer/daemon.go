@@ -123,6 +123,9 @@ var daemonCmd = &cobra.Command{
 
 		fmt.Printf("serving on %s\n", daemonServerAddr)
 		logger.Infof("serving on %s", daemonServerAddr)
+
+		go websocket22()
+
 		api.Serve(ctx, daemonServerAddr, db, bot, logger, makeOptions())
 		wg.Wait()
 	},
@@ -212,6 +215,17 @@ func handleBlock(block *rpcs.EncodedBlockCert, imp importer.Importer) error {
 	}
 
 	logger.Infof("round r=%d (%d txn) imported in %s", block.Block.Round(), len(block.Block.Payset), dt.String())
+
+	// // Payset []SignedTxnInBlock
+	// for i, ps := range block.Block.Payset {
+	// 	// SignedTxnInBlock.ApplyData.ApplicationID
+	// 	// SignedTxnInBlock.ApplyData.EvalDelta ?
+	// // logger.Debugf("\t %d %d", i, ps.ApplyData.ApplicationID)
+	// // logger.Debugf("\t %v", ps.ApplyData.EvalDelta.GlobalDelta)
+	// // logger.Debugf("\t %v", ps.ApplyData.EvalDelta.LocalDeltas)
+	// // logger.Debugf("\t %v", ps.ApplyData.EvalDelta.Logs)
+	// // logger.Debugf("\t %v", ps.ApplyData.EvalDelta.InnerTxns)
+	// }
 
 	return nil
 }
