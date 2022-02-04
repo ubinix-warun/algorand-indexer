@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/algorand/go-algorand/rpcs"
+	"github.com/algorand/go-algorand/data/transactions"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -20,6 +21,9 @@ import (
 	"github.com/algorand/indexer/idb"
 	"github.com/algorand/indexer/importer"
 	"github.com/algorand/indexer/util/metrics"
+
+    "encoding/json"
+
 )
 
 var (
@@ -35,6 +39,8 @@ var (
 	writeTimeout     time.Duration
 	readTimeout      time.Duration
 )
+
+var pubs chan transactions.SignedTxnInBlock
 
 var daemonCmd = &cobra.Command{
 	Use:   "daemon",
@@ -124,7 +130,7 @@ var daemonCmd = &cobra.Command{
 		fmt.Printf("serving on %s\n", daemonServerAddr)
 		logger.Infof("serving on %s", daemonServerAddr)
 
-		go websocket22()
+		go publisher()
 
 		api.Serve(ctx, daemonServerAddr, db, bot, logger, makeOptions())
 		wg.Wait()
@@ -149,6 +155,9 @@ func init() {
 	viper.RegisterAlias("algod-net", "algod-address")
 	viper.RegisterAlias("server", "server-address")
 	viper.RegisterAlias("token", "api-token")
+
+	pubs = make(chan transactions.SignedTxnInBlock, 20)
+
 }
 
 // makeOptions converts CLI options to server options
@@ -217,15 +226,27 @@ func handleBlock(block *rpcs.EncodedBlockCert, imp importer.Importer) error {
 	logger.Infof("round r=%d (%d txn) imported in %s", block.Block.Round(), len(block.Block.Payset), dt.String())
 
 	// // Payset []SignedTxnInBlock
+	for _, ps := range block.Block.Payset {
+
 	// for i, ps := range block.Block.Payset {
 	// 	// SignedTxnInBlock.ApplyData.ApplicationID
 	// 	// SignedTxnInBlock.ApplyData.EvalDelta ?
+
 	// // logger.Debugf("\t %d %d", i, ps.ApplyData.ApplicationID)
 	// // logger.Debugf("\t %v", ps.ApplyData.EvalDelta.GlobalDelta)
 	// // logger.Debugf("\t %v", ps.ApplyData.EvalDelta.LocalDeltas)
 	// // logger.Debugf("\t %v", ps.ApplyData.EvalDelta.Logs)
 	// // logger.Debugf("\t %v", ps.ApplyData.EvalDelta.InnerTxns)
-	// }
+
+		ed, err := json.Marshal(ps.ApplyData.EvalDelta)
+        if err != nil {
+            // panic(err)
+			logger.Debugf("%v", err)
+        } else {
+        	logger.Debugf("%s",string(ed)) // {"full_name":"Bob"}
+		}
+
+	}
 
 	return nil
 }
