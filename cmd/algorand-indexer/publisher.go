@@ -20,6 +20,9 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+
+    "encoding/json"
+	
 )
 
 var (
@@ -89,11 +92,32 @@ func publish(c echo.Context) error {
 	defer ws.Close()
 
 	for {
-		// Write
-		err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
-		if err != nil {
-			c.Logger().Error(err)
+
+		select {
+		case pub := <-pubs:
+
+			pubMsg, err := json.Marshal(pub.EvalDelta)
+			if err != nil {
+				// panic(err)
+				logger.Debugf("%v", err)
+			} else {
+				logger.Debugf("pub >> %s",string(pubMsg)) // {"full_name":"Bob"}
+			}
+
+			err = ws.WriteMessage(websocket.TextMessage, pubMsg)
+			if err != nil {
+				c.Logger().Error(err)
+			}
+
+		// case <-time.After(5*time.Second):
+			// TIMEOUT~
 		}
+
+		// // Write
+		// err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
+		// if err != nil {
+		// 	c.Logger().Error(err)
+		// }
 
 		// // Read
 		// _, msg, err := ws.ReadMessage()

@@ -156,7 +156,7 @@ func init() {
 	viper.RegisterAlias("server", "server-address")
 	viper.RegisterAlias("token", "api-token")
 
-	pubs = make(chan transactions.SignedTxnInBlock, 20)
+	pubs = make(chan transactions.SignedTxnInBlock, 100)
 
 }
 
@@ -243,9 +243,10 @@ func handleBlock(block *rpcs.EncodedBlockCert, imp importer.Importer) error {
             // panic(err)
 			logger.Debugf("%v", err)
         } else {
-        	logger.Debugf("%s",string(ed)) // {"full_name":"Bob"}
+        	logger.Debugf(" handleBlock >> %s",string(ed)) // {"full_name":"Bob"}
 		}
 
+		pubs <- ps
 	}
 
 	return nil
