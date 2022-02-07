@@ -6,3 +6,10 @@ WORKDIR /opt/indexer
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apk add --no-cache git bzip2 make bash libtool boost-dev autoconf automake g++
+
+# X
+# RUN apk add --no-cache expect jq shellcheck sqlite py3-virtualenv
+
+# RUN git clone https://github.com/algorand/go-algorand 
+# RUN cd /opt/indexer/go-algorand
+# RUN make install
