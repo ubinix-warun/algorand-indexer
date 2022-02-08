@@ -9,7 +9,7 @@ In my demo, offchain worker will subscribe event from the indexer, feed some-dat
 
 FYI: The Indexer is a standalone service that reads committed blocks from the Algorand blockchain and maintains a database of transactions and accounts that are searchable and indexed.
 
-# Algorand Challenge: Developer Tooling
+### Algorand Challenge: Developer Tooling
 
 ![PT2](https://raw.githubusercontent.com/ubinix-warun/algorand-offchain-worker/main/doc/assets/gitcoin_bounties.png)
 
