@@ -1,13 +1,6 @@
 | develop-pub <br> [![CircleCI](https://circleci.com/gh/ubinix-warun/algorand-indexer/tree/develop-pub.svg?style=svg)](https://circleci.com/gh/ubinix-warun/algorand-indexer/tree/develop-pub) |
 | --- |
 
-# Algorand Challenge: Developer Tooling
-
-![PT2](https://raw.githubusercontent.com/ubinix-warun/algorand-offchain-worker/main/doc/assets/gitcoin_bounties.png)
-
-https://gitcoin.co/issue/algorandfoundation/grow-algorand/132/100027512
-
-
 # Algorand Indexer (POC: Pubish-Subscribe Event)
 
 My Proof of Concept is create block publisher, and send EvalDelta over Websocket to subscriber.
@@ -15,6 +8,13 @@ My Proof of Concept is create block publisher, and send EvalDelta over Websocket
 In my demo, offchain worker will subscribe event from the indexer, feed some-data to algod via TEAL contract.
 
 FYI: The Indexer is a standalone service that reads committed blocks from the Algorand blockchain and maintains a database of transactions and accounts that are searchable and indexed.
+
+# Algorand Challenge: Developer Tooling
+
+![PT2](https://raw.githubusercontent.com/ubinix-warun/algorand-offchain-worker/main/doc/assets/gitcoin_bounties.png)
+
+https://gitcoin.co/issue/algorandfoundation/grow-algorand/132/100027512
+
 
 # Tested Requirements Versions
 
