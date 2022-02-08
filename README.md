@@ -1,5 +1,5 @@
-| master <br> [![CircleCI](https://circleci.com/gh/algorand/indexer/tree/master.svg?style=svg)](https://circleci.com/gh/algorand/indexer/tree/master) | develop <br> [![CircleCI](https://circleci.com/gh/algorand/indexer/tree/develop.svg?style=svg)](https://circleci.com/gh/algorand/indexer/tree/develop) |
-| --- | --- |
+| develop-pub <br> [![CircleCI](https://circleci.com/gh/ubinix-warun/algorand-indexer/tree/develop-pub.svg?style=svg)](https://circleci.com/gh/ubinix-warun/algorand-indexer/tree/develop-pub) |
+| --- |
 
 # Algorand Indexer
 
