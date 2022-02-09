@@ -50,10 +50,10 @@ func main() {
 
 			if err := json.Unmarshal(byt, &dat); err != nil {
 				log.Println("unmarshal:", err)
-				log.Printf(" >>> recv: %s", string(byt))
+				// log.Printf(" >>> recv: %s", string(byt))
 			}
 
-			// log.Printf("recv: %s", string(byt))
+			log.Printf("recv: %s", string(byt))
 			log.Println("type:", dat)
 
 		}

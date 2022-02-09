@@ -5,16 +5,15 @@
 
 My Proof of Concept is create block publisher, and send EvalDelta over Websocket to subscriber.
 
-In my demo, offchain worker will subscribe event from the indexer, feed some-data to algod via TEAL contract.
+[In my demo](https://github.com/ubinix-warun/algorand-offchain-worker), offchain worker will subscribe event from the indexer, feed some-data to algod via TEAL contract.
 
-FYI: The Indexer is a standalone service that reads committed blocks from the Algorand blockchain and maintains a database of transactions and accounts that are searchable and indexed.
+The Indexer is a standalone service that reads committed blocks from the Algorand blockchain and maintains a database of transactions and accounts that are searchable and indexed.
 
 ### Algorand Challenge: Developer Tooling
 
 ![PT2](https://raw.githubusercontent.com/ubinix-warun/algorand-offchain-worker/main/doc/assets/gitcoin_bounties.png)
 
 https://gitcoin.co/issue/algorandfoundation/grow-algorand/132/100027512
-
 
 # Tested Requirements Versions
 
@@ -40,6 +39,14 @@ Once running, here are a few commands to try out:
 ~$ curl "localhost:8980/health"
 ```
 
+For offchain worker (My POC🔥🔥🔥):
+```bash
+~$ make cmd/algorand-indexer/offchain-worker
+~$ ./cmd/algorand-indexer/offchain-worker --addr=localhost:1323
+
+```
+![PT2](https://raw.githubusercontent.com/ubinix-warun/algorand-offchain-worker/main/doc/assets/proto_indexer2.png)
+
 # Features
 
 - Search and filter accounts, transactions, assets, and asset balances with many different parameters:
@@ -62,6 +69,7 @@ Once running, here are a few commands to try out:
     - Close amount when applicable
     - Rewards
 - Human readable field names instead of the space optimized protocol level names.
+- POC🔥🔥🔥: pubsub event. block.EvalDelta etc.
 
 There are a number of technical features as well:
 - Abstracted database layer. We want to support many different backend databases.

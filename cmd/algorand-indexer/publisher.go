@@ -104,9 +104,9 @@ func publish(c echo.Context) error {
 				logger.Debugf("pub >> %s",string(pubMsg)) // {"full_name":"Bob"}
 			}
 
-			err = ws.WriteMessage(websocket.TextMessage, pubMsg)
+			err = ws.WriteMessage(websocket.BinaryMessage, pubMsg)
 			if err != nil {
-				c.Logger().Error(err)
+				logger.Debugf("%v", err)
 			}
 
 		// case <-time.After(5*time.Second):
