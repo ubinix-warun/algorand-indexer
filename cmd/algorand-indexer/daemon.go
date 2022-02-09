@@ -238,7 +238,7 @@ func handleBlock(block *rpcs.EncodedBlockCert, imp importer.Importer) error {
 	// // logger.Debugf("\t %v", ps.ApplyData.EvalDelta.Logs)
 	// // logger.Debugf("\t %v", ps.ApplyData.EvalDelta.InnerTxns)
 
-		ed, err := json.Marshal(ps.ApplyData.EvalDelta)
+		ed, err := json.Marshal(ps.ApplyData)
         if err != nil {
             // panic(err)
 			logger.Debugf("%v", err)

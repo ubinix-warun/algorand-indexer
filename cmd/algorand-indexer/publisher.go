@@ -96,7 +96,7 @@ func publish(c echo.Context) error {
 		select {
 		case pub := <-pubs:
 
-			pubMsg, err := json.Marshal(pub.EvalDelta)
+			pubMsg, err := json.Marshal(pub)
 			if err != nil {
 				// panic(err)
 				logger.Debugf("%v", err)
@@ -107,24 +107,13 @@ func publish(c echo.Context) error {
 			err = ws.WriteMessage(websocket.BinaryMessage, pubMsg)
 			if err != nil {
 				logger.Debugf("%v", err)
+				return err
 			}
 
 		// case <-time.After(5*time.Second):
-			// TIMEOUT~
+			// ws.
 		}
 
-		// // Write
-		// err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
-		// if err != nil {
-		// 	c.Logger().Error(err)
-		// }
-
-		// // Read
-		// _, msg, err := ws.ReadMessage()
-		// if err != nil {
-		// 	c.Logger().Error(err)
-		// }
-		// fmt.Printf("%s\n", msg)
 	}
 }
 

@@ -39,13 +39,13 @@ Once running, here are a few commands to try out:
 ~$ curl "localhost:8980/health"
 ```
 
-For offchain worker (My POC🔥🔥🔥):
+For offchain worker (POC🔥🔥🔥):
 ```bash
 ~$ make cmd/algorand-indexer/offchain-worker
 ~$ ./cmd/algorand-indexer/offchain-worker --addr=localhost:1323
 
 ```
-![PT2](https://raw.githubusercontent.com/ubinix-warun/algorand-offchain-worker/main/doc/assets/proto_indexer2.png)
+![PT2](https://raw.githubusercontent.com/ubinix-warun/algorand-offchain-worker/main/doc/assets/proto_indexer3.png)
 
 # Features
 

@@ -42,20 +42,30 @@ func main() {
 		for {
 			_, byt, err := c.ReadMessage()
 			if err != nil {
-				log.Println("read:", err)
+				log.Println("read: ", err)
 				return
 			}
 
-			var dat transactions.EvalDelta
+			var dat transactions.ApplyData
 
 			if err := json.Unmarshal(byt, &dat); err != nil {
-				log.Println("unmarshal:", err)
+				log.Println("unmarshal: ", err)
 				// log.Printf(" >>> recv: %s", string(byt))
 			}
 
 			log.Printf("recv: %s", string(byt))
-			log.Println("type:", dat)
+			log.Println("ApplicationID: ", dat.ApplicationID)
+			log.Println("EvalDelta: ", dat.EvalDelta)
+			
+			// FIX: ADDRESS! < PrivateKey
 
+			// globalState["reqm"]
+			// globalState["requrl"]
+
+
+			// globalState["resp"] < Result
+
+			// 
 		}
 	}()
 
