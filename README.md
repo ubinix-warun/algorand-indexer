@@ -3,7 +3,7 @@
 
 # Algorand Indexer (POC: Pubish-Subscribe Event)
 
-My Proof of Concept is create block publisher, and send EvalDelta over Websocket to subscriber.
+My Proof of Concept is create block publisher, and send tx.ApplyData over Websocket to subscriber.
 
 [In my demo](https://github.com/ubinix-warun/algorand-offchain-worker), offchain worker will subscribe event from the indexer, feed some-data to algod via TEAL contract.
 
@@ -69,7 +69,7 @@ For offchain worker (POC🔥🔥🔥):
     - Close amount when applicable
     - Rewards
 - Human readable field names instead of the space optimized protocol level names.
-- POC🔥🔥🔥: pubsub event. block.EvalDelta etc.
+- POC🔥🔥🔥: pubsub event. block.ApplyData etc.
 
 There are a number of technical features as well:
 - Abstracted database layer. We want to support many different backend databases.
