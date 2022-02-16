@@ -92,6 +92,9 @@ type AccountParticipation struct {
 	// \[sel\] Selection public key (if any) currently registered for this round.
 	SelectionParticipationKey []byte `json:"selection-participation-key"`
 
+	// \[stprf\] Root of the state proof key (if any)
+	StateProofKey *[]byte `json:"state-proof-key,omitempty"`
+
 	// \[voteFst\] First round for which this participation is valid.
 	VoteFirstValid uint64 `json:"vote-first-valid"`
 
@@ -476,7 +479,7 @@ type TealValue struct {
 	// \[tb\] bytes value.
 	Bytes string `json:"bytes"`
 
-	// \[tt\] value type.
+	// \[tt\] value type. Value `1` refers to **bytes**, value `2` refers to **uint**
 	Type uint64 `json:"type"`
 
 	// \[ui\] uint value.
@@ -720,6 +723,9 @@ type TransactionKeyreg struct {
 
 	// \[selkey\] Public key used with the Verified Random Function (VRF) result during committee selection.
 	SelectionParticipationKey *[]byte `json:"selection-participation-key,omitempty"`
+
+	// \[sprfkey\] State proof key used in key registration transactions.
+	StateProofKey *[]byte `json:"state-proof-key,omitempty"`
 
 	// \[votefst\] First round this participation key is valid.
 	VoteFirstValid *uint64 `json:"vote-first-valid,omitempty"`

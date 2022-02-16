@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -18,6 +19,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/algorand/go-algorand-sdk/encoding/msgpack"
+	"github.com/algorand/go-algorand/crypto"
+	"github.com/algorand/go-algorand/crypto/merklesignature"
 	"github.com/algorand/go-algorand/data/basics"
 	"github.com/algorand/go-algorand/data/bookkeeping"
 	"github.com/algorand/go-algorand/data/transactions"
@@ -332,6 +335,15 @@ func TestFetchTransactions(t *testing.T) {
 			},
 		},
 		{
+			name: "Key Registration with state proof key",
+			txnBytes: [][]byte{
+				loadResourceFileOrPanic("test_resources/keyregwithsprfkey.txn"),
+			},
+			response: []generated.Transaction{
+				loadTransactionFromFile("test_resources/keyregwithsprfkey.response"),
+			},
+		},
+		{
 			name: "Asset Configuration",
 			txnBytes: [][]byte{
 				loadResourceFileOrPanic("test_resources/asset_config.txn"),
@@ -518,8 +530,8 @@ func TestFetchTransactions(t *testing.T) {
 			response []generated.Transaction
 			created  uint64
 		}{
-			name:     "Application inner asset create",
-			txnBytes: [][]byte{createTxn(t, "test_resources/app_call_inner_acfg.txn")},
+			name:     "Key Registration with state proof key",
+			txnBytes: [][]byte{createTxn(t, "test_resources/keyregwithsprfkey.txn")},
 		})
 	}
 
@@ -627,49 +639,37 @@ func TestFetchAccountsRewindRoundTooLarge(t *testing.T) {
 
 // createTxn allows saving msgp-encoded canonical object to a file in order to add more test data
 func createTxn(t *testing.T, target string) []byte {
+	defer assert.Fail(t, "this method should only be used for generating test inputs.")
 	addr1, err := basics.UnmarshalChecksumAddress("PT4K5LK4KYIQYYRAYPAZIEF47NVEQRDX3CPYWJVH25LKO2METIRBKRHRAE")
 	assert.Error(t, err)
-	addr2, err := basics.UnmarshalChecksumAddress("PIJRXIH5EJF7HT43AZQOQBPEZUTTCJCZ3E5U3QHLE33YP2ZHGXP7O7WN3U")
-	assert.Error(t, err)
+	var votePK crypto.OneTimeSignatureVerifier
+	votePK[0] = 1
+
+	var selectionPK crypto.VRFVerifier
+	selectionPK[0] = 1
+
+	var sprfkey merklesignature.Verifier
+	sprfkey[0] = 1
 
 	stxnad := transactions.SignedTxnWithAD{
 		SignedTxn: transactions.SignedTxn{
 			Txn: transactions.Transaction{
-				Type: protocol.ApplicationCallTx,
+				Type: protocol.KeyRegistrationTx,
 				Header: transactions.Header{
 					Sender: addr1,
 				},
-				ApplicationCallTxnFields: transactions.ApplicationCallTxnFields{
-					ApplicationID: 444,
+				KeyregTxnFields: transactions.KeyregTxnFields{
+					VotePK:           votePK,
+					SelectionPK:      selectionPK,
+					StateProofPK:     sprfkey,
+					VoteFirst:        basics.Round(0),
+					VoteLast:         basics.Round(100),
+					VoteKeyDilution:  1000,
+					Nonparticipation: false,
 				},
 			},
 		},
-		ApplyData: transactions.ApplyData{
-			EvalDelta: transactions.EvalDelta{
-				InnerTxns: []transactions.SignedTxnWithAD{
-					{
-						SignedTxn: transactions.SignedTxn{
-							Txn: transactions.Transaction{
-								Type: protocol.AssetConfigTx,
-								Header: transactions.Header{
-									Sender:     addr2,
-									Fee:        basics.MicroAlgos{Raw: 654},
-									FirstValid: 3,
-								},
-								AssetConfigTxnFields: transactions.AssetConfigTxnFields{
-									AssetParams: basics.AssetParams{
-										URL: "http://example.com",
-									},
-								},
-							},
-						},
-						ApplyData: transactions.ApplyData{
-							ConfigAsset: 555,
-						},
-					},
-				},
-			},
-		},
+		ApplyData: transactions.ApplyData{},
 	}
 
 	data := msgpack.Encode(stxnad)
@@ -914,6 +914,59 @@ func TestTimeouts(t *testing.T) {
 			require.Equal(t, http.StatusServiceUnavailable, rec1.Code)
 			require.Contains(t, bodyStr, tc.errString)
 			require.Contains(t, bodyStr, "timeout")
+		})
+	}
+}
+
+func TestApplicationLimits(t *testing.T) {
+	testcases := []struct {
+		name     string
+		limit    *uint64
+		expected uint64
+	}{
+		{
+			name:     "Default",
+			limit:    nil,
+			expected: defaultApplicationsLimit,
+		},
+		{
+			name:     "Max",
+			limit:    uint64Ptr(math.MaxUint64),
+			expected: maxApplicationsLimit,
+		},
+	}
+
+	// Mock backend to capture default limits
+	mockIndexer := &mocks.IndexerDb{}
+	si := ServerImplementation{
+		db:      mockIndexer,
+		timeout: 5 * time.Millisecond,
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Setup context...
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rec1 := httptest.NewRecorder()
+			c := e.NewContext(req, rec1)
+
+			// check parameters passed to the backend
+			mockIndexer.
+				On("Applications", mock.Anything, mock.Anything, mock.Anything).
+				Return(nil, uint64(0)).
+				Run(func(args mock.Arguments) {
+					require.Len(t, args, 2)
+					require.IsType(t, &generated.SearchForApplicationsParams{}, args[1])
+					params := args[1].(*generated.SearchForApplicationsParams)
+					require.NotNil(t, params.Limit)
+					require.Equal(t, *params.Limit, tc.expected)
+				})
+
+			err := si.SearchForApplications(c, generated.SearchForApplicationsParams{
+				Limit: tc.limit,
+			})
+			require.NoError(t, err)
 		})
 	}
 }

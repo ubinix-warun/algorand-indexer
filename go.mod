@@ -1,11 +1,11 @@
 module github.com/algorand/indexer
 
-go 1.16
+go 1.13
 
 replace github.com/algorand/go-algorand => ./third_party/go-algorand
 
 require (
-	github.com/algorand/go-algorand v0.0.0-20210803210013-358a2e1609c9
+	github.com/algorand/go-algorand v0.0.0-20220211161928-53b157beb10f
 	github.com/algorand/go-algorand-sdk v1.9.1
 	github.com/algorand/go-codec/codec v1.1.7
 	github.com/algorand/oapi-codegen v1.3.5-algorand5
@@ -27,5 +27,5 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/vektra/mockery v1.1.2 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
-	golang.org/x/tools v0.1.8 // indirect
+	golang.org/x/tools v0.1.9 // indirect
 )
