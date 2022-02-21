@@ -9,12 +9,6 @@ My Proof of Concept is create block publisher, and send tx.ApplyData over Websoc
 
 The Indexer is a standalone service that reads committed blocks from the Algorand blockchain and maintains a database of transactions and accounts that are searchable and indexed.
 
-### Algorand Challenge: Developer Tooling
-
-![PT2](https://raw.githubusercontent.com/ubinix-warun/algorand-offchain-worker/main/doc/assets/gitcoin_bounties.png)
-
-https://gitcoin.co/issue/algorandfoundation/grow-algorand/132/100027512
-
 # Tested Requirements Versions
 
 * [go 1.13](https://golang.org/dl/)
@@ -262,3 +256,12 @@ Indexer v1 was built into the algod v1 REST API. It has been removed with the al
 Indexer is built using an in-house task framework called [`mule`](https://pypi.org/project/mulecli/) (it has since been open-sourced).
 
 Please refer to the [build docs](mule/README.md) in the `mule/` directory.
+
+# Credit
+
+### Algorand Challenge: Developer Tooling
+
+![PT2](https://raw.githubusercontent.com/ubinix-warun/algorand-offchain-worker/main/doc/assets/gitcoin_bounties.png)
+
+https://gitcoin.co/issue/algorandfoundation/grow-algorand/132/100027512
+
