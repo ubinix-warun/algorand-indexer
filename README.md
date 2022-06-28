@@ -3,11 +3,7 @@
 
 # Algorand Indexer (POC: Pubish-Subscribe Event)
 
-My Proof of Concept is create block publisher, and send tx.ApplyData over Websocket to subscriber.
-
-[In my demo](https://github.com/ubinix-warun/algorand-offchain-worker), offchain worker will subscribe event from the indexer, feed some-data to algod via TEAL contract.
-
-The Indexer is a standalone service that reads committed blocks from the Algorand blockchain and maintains a database of transactions and accounts that are searchable and indexed.
+...
 
 # Tested Requirements Versions
 
