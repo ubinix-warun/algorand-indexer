@@ -1,0 +1,17 @@
+ARG GO_VERSION=1.18.1
+FROM golang:$GO_VERSION-alpine
+
+ENV HOME /opt/indexer
+WORKDIR /opt/indexer
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN apk add --no-cache git bzip2 make bash libtool boost-dev autoconf automake g++
+
+# X
+
+# RUN apk add --no-cache expect jq shellcheck sqlite py3-virtualenv
+
+# RUN cd /opt/
+# RUN git clone https://github.com/algorand/go-algorand 
+# RUN cd /opt/go-algorand
+# RUN make install
