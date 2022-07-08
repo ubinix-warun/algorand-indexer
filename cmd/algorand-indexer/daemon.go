@@ -22,8 +22,11 @@ import (
 	"github.com/algorand/indexer/config"
 	"github.com/algorand/indexer/fetcher"
 	"github.com/algorand/indexer/idb"
+	"github.com/algorand/indexer/pubsub"
 	"github.com/algorand/indexer/importer"
 	"github.com/algorand/indexer/util/metrics"
+
+    "encoding/json"
 )
 
 var (
@@ -195,6 +198,7 @@ var daemonCmd = &cobra.Command{
 
 		opts.MaxConn = maxConn
 
+		pub := pubsub.NewPublisher()
 		db, availableCh := indexerDbFromFlags(opts)
 		defer db.Close()
 		var wg sync.WaitGroup
@@ -223,7 +227,7 @@ var daemonCmd = &cobra.Command{
 				bot.SetNextRound(nextRound)
 
 				imp := importer.NewImporter(db)
-				handler := blockHandler(imp, 1*time.Second)
+				handler := blockHandler(imp, 1*time.Second, pub)
 				bot.SetBlockHandler(handler)
 
 				logger.Info("Starting block importer.")
@@ -359,10 +363,10 @@ func makeOptions() (options api.ExtraOptions) {
 
 // blockHandler creates a handler complying to the fetcher block handler interface. In case of a failure it keeps
 // attempting to add the block until the fetcher shuts down.
-func blockHandler(imp importer.Importer, retryDelay time.Duration) func(context.Context, *rpcs.EncodedBlockCert) error {
+func blockHandler(imp importer.Importer, retryDelay time.Duration, pub *pubsub.Publisher) func(context.Context, *rpcs.EncodedBlockCert) error {
 	return func(ctx context.Context, block *rpcs.EncodedBlockCert) error {
 		for {
-			err := handleBlock(block, imp)
+			err := handleBlock(block, imp, pub)
 			if err == nil {
 				// return on success.
 				return nil
@@ -379,7 +383,7 @@ func blockHandler(imp importer.Importer, retryDelay time.Duration) func(context.
 	}
 }
 
-func handleBlock(block *rpcs.EncodedBlockCert, imp importer.Importer) error {
+func handleBlock(block *rpcs.EncodedBlockCert, imp importer.Importer, pub *pubsub.Publisher) error {
 	start := time.Now()
 	err := imp.ImportBlock(block)
 	if err != nil {
@@ -404,6 +408,23 @@ func handleBlock(block *rpcs.EncodedBlockCert, imp importer.Importer) error {
 	}
 
 	logger.Infof("round r=%d (%d txn) imported in %s", block.Block.Round(), len(block.Block.Payset), dt.String())
+
+	if(pub != nil) {
+		for _, ps := range block.Block.Payset {
+
+			ed, err := json.Marshal(ps.ApplyData)
+			if err != nil {
+				// panic(err)
+				logger.Debugf("%v", err)
+
+			} else {
+				logger.Debugf(" handleBlock >> %s",string(ed))
+
+			}
+	
+			(*pub).Pubs <- ps
+		}
+	}
 
 	return nil
 }

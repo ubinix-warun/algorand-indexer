@@ -29,7 +29,7 @@ var (
 )
 
 // UnknownVersion is used when the version is not known.
-const UnknownVersion = "(unknown version) XYZ"
+const UnknownVersion = "(unknown version) XYZ.1"
 
 // Version the binary version.
 func Version() string {
