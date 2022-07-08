@@ -410,7 +410,7 @@ func handleBlock(block *rpcs.EncodedBlockCert, imp importer.Importer, pub *pubsu
 	logger.Infof("round r=%d (%d txn) imported in %s", block.Block.Round(), len(block.Block.Payset), dt.String())
 
 	if(pub != nil) {
-		logger.Debugf("pub=OK")
+		// logger.Debugf("pub=OK")
 		for _, ps := range block.Block.Payset {
 
 			ed, err := json.Marshal(ps.ApplyData)
