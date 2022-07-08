@@ -33,8 +33,8 @@ start_with_algod() {
     --algod-net "${ALGOD_ADDR}" \
     --algod-token "${ALGOD_TOKEN}" \
     --genesis "genesis.json" \
-    --data-dir /tmp \ # USE TMP FOR INDEXER_DATA
-    --loglevel "debug" \ # ENABLE: DEBUG
+    --data-dir /tmp \
+    --loglevel "debug" \
     --logfile "/tmp/indexer-log.txt" >> /tmp/command.txt
 }
 
