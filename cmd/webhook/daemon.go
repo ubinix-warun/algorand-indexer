@@ -100,6 +100,7 @@ func DaemonCmd() *cobra.Command {
 		},
 	}
 
+	cfg.flags = daemonCmd.Flags()
 	cfg.flags.StringVarP(&cfg.algodDataDir, "algod", "d", "", "path to algod data dir, or $ALGORAND_DATA")
 	cfg.flags.StringVarP(&cfg.algodAddr, "algod-net", "", "", "host:port of algod")
 	cfg.flags.StringVarP(&cfg.algodToken, "algod-token", "", "", "api access token for algod")
@@ -300,7 +301,7 @@ func runDaemon(daemonConfig *daemonConfig) error {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(daemonConfig.daemonServerAddr))
 
 	// api.Serve(ctx, daemonConfig.daemonServerAddr, db, bot, logger, options)
 	wg.Wait()
@@ -313,8 +314,11 @@ func runBlockProcesser(ctx context.Context, cfg *daemonConfig, wg *sync.WaitGrou
 	defer exitHandler()
 	defer wg.Done()
 
-	// Wait until the database is available.
-	<-dbAvailable
+	if !dummyIndexerDb {
+		// Wait until the database is available.
+		<-dbAvailable
+
+	}
 
 	// Initial import if needed.
 	genesisReader := importer.GetGenesisFile(cfg.genesisJSONPath, bot.Algod(), logger)
@@ -337,10 +341,16 @@ func runBlockProcesser(ctx context.Context, cfg *daemonConfig, wg *sync.WaitGrou
 		maybeFail(err, "blockprocessor.MakeProcessor() err %v", err)
 	}
 
+	fmt.Printf("block processing -- MakeProcessorWithLedgerInit")
+	logger.Infof("block processing -- MakeProcessorWithLedgerInit")
+
 	bot.SetNextRound(proc.NextRoundToProcess())
 	handler := blockHandler(proc, 1*time.Second)
 	bot.SetBlockHandler(handler)
 	
+	fmt.Printf("block processing -- SetBlockHandler")
+	logger.Infof("block processing -- SetBlockHandler")
+
 	logger.Info("Starting block processor.")
 	err = bot.Run(ctx)
 	if err != nil {

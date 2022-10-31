@@ -88,7 +88,15 @@ func indexerDbFromFlags(opts idb.IndexerDbOptions) (idb.IndexerDb, chan struct{}
 	// 	return db, ch
 	// }
 	if dummyIndexerDb {
-		return dummy.IndexerDb(), nil
+		idb := dummy.IndexerDb()
+		if idb.log == nil {
+			idb.log = log.New()
+			idb.log.SetFormatter(&log.JSONFormatter{})
+			idb.log.SetOutput(os.Stdout)
+			idb.log.SetLevel(log.TraceLevel)
+		}
+
+		return idb, nil
 	}
 	logger.Errorf("no import db set")
 	panic(exit{1})

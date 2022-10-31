@@ -26,6 +26,9 @@ export GO_IMAGE = golang:$(shell go version | cut -d ' ' -f 3 | tail -c +3 )
 cmd/algorand-indexer/algorand-indexer: idb/postgres/internal/schema/setup_postgres_sql.go go-algorand
 	cd cmd/algorand-indexer && go build -ldflags="${GOLDFLAGS}"
 
+cmd/webhook/webhook: go-algorand
+	cd cmd/webhook && go build -ldflags="${GOLDFLAGS}"
+
 go-algorand:
 	git submodule update --init && cd third_party/go-algorand && \
 		make crypto/libs/`scripts/ostype.sh`/`scripts/archtype.sh`/lib/libsodium.a
@@ -101,4 +104,4 @@ indexer-v-algod: nightly-setup indexer-v-algod-swagger nightly-teardown
 update-submodule:
 	git submodule update --remote
 
-.PHONY: test e2e integration fmt lint deploy sign test-package package fakepackage cmd/algorand-indexer/algorand-indexer idb/mocks/IndexerDb.go go-algorand indexer-v-algod
+.PHONY: test e2e integration fmt lint deploy sign test-package package fakepackage cmd/algorand-indexer/algorand-indexer idb/mocks/IndexerDb.go go-algorand indexer-v-algod cmd/webhook/webhook
