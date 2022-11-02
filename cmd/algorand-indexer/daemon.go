@@ -28,6 +28,7 @@ import (
 	"github.com/algorand/indexer/importer"
 	"github.com/algorand/indexer/processor"
 	"github.com/algorand/indexer/processor/blockprocessor"
+	"github.com/algorand/indexer/pubsub"
 	iutil "github.com/algorand/indexer/util"
 	"github.com/algorand/indexer/util/metrics"
 )
@@ -92,6 +93,8 @@ type daemonConfig struct {
 	configFile                string
 	suppliedAPIConfigFile     string
 	genesisJSONPath           string
+	pubSocketAddr	          string
+	pubSocketToken	          string
 }
 
 // DaemonCmd creates the main cobra command, initializes flags, and viper aliases
@@ -122,6 +125,9 @@ func DaemonCmd() *cobra.Command {
 	cfg.flags.DurationVarP(&cfg.writeTimeout, "write-timeout", "", 30*time.Second, "set the maximum duration to wait before timing out writes to a http response, breaking connection")
 	cfg.flags.DurationVarP(&cfg.readTimeout, "read-timeout", "", 5*time.Second, "set the maximum duration for reading the entire request")
 	cfg.flags.Uint32VarP(&cfg.maxConn, "max-conn", "", 0, "set the maximum connections allowed in the connection pool, if the maximum is reached subsequent connections will wait until a connection becomes available, or timeout according to the read-timeout setting")
+
+	cfg.flags.StringVarP(&cfg.pubSocketAddr, "pubsocket", "K", ":1323", "host:port to serve PubSocket on (default :1323)")
+	cfg.flags.StringVarP(&cfg.pubSocketToken, "pubtoken", "N", "", "pub token, when set REST calls must use this token in a bearer format, or in a 'X-PubSocket-API-Token' header")
 
 	cfg.flags.StringVar(&cfg.suppliedAPIConfigFile, "api-config-file", "", "supply an API config file to enable/disable parameters")
 	cfg.flags.BoolVar(&cfg.enableAllParameters, "enable-all-parameters", false, "override default configuration and enable all parameters. Can't be used with --api-config-file")
@@ -352,6 +358,12 @@ func runDaemon(daemonConfig *daemonConfig) error {
 		// no algod was found
 		daemonConfig.noAlgod = true
 	}
+
+	fmt.Printf("publish sock %s\n", daemonConfig.pubSocketAddr)
+	logger.Infof("publish sock %s", daemonConfig.pubSocketAddr)
+	
+	pubsub.NewPubSocket(daemonConfig.pubSocketAddr, daemonConfig.pubSocketToken)
+
 	opts := idb.IndexerDbOptions{}
 	if daemonConfig.noAlgod && !daemonConfig.allowMigration {
 		opts.ReadOnly = true
@@ -539,6 +551,16 @@ func handleBlock(block *rpcs.EncodedBlockCert, proc processor.Processor) error {
 	}
 
 	logger.Infof("round r=%d (%d txn) imported in %s", block.Block.Round(), len(block.Block.Payset), dt.String())
+
+	if pubsub.GetPubSocket() != nil {
+		for _, ps := range block.Block.Payset {
+			if len(pubsub.GetPubSocket().Tx) < 100 { // Limit 100
+				pubsub.GetPubSocket().Tx <- ps
+			} else {
+				logger.Warnf("PubSub: Over limit 100 block.")
+			}
+		}
+	}
 
 	return nil
 }
