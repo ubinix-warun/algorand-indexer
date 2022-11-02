@@ -14,6 +14,7 @@ import(
 
 	"bytes"
     "encoding/json"
+	"strconv"
 )
 
 const MAX_CH_BUFFER = 100
@@ -169,6 +170,17 @@ func (imp *PubSocket) CheckRules(t Topic, tx transactions.SignedTxnInBlock) bool
 	}
 	if t.Type == "RECEIVER" && t.Param == tx.Txn.Receiver.String() {
 		return true
+	}
+	if t.Type == "APPID" && (t.Param != "0" && len(t.Param) > 0) {
+		appId, err := strconv.Atoi(t.Param)
+		if err != nil {
+			// false
+			fmt.Printf("PubSocket.CheckRules: %v\r\n", err)
+		} else {
+			if uint64(appId) == uint64(tx.ApplicationID) {
+				return true
+			}
+		}
 	}
 
 	return false;
